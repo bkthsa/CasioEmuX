@@ -1,0 +1,40 @@
+name: C++ Build with Meson on Windows
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest  # This ensures that your build runs on a Windows environment.
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Meson and Ninja
+      run: |
+        choco install meson ninja
+
+    - name: Install Visual Studio Build Tools
+      run: |
+        choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools"
+        choco install visualstudio2019-workload-vctools
+
+    - name: Configure Meson (Build Setup)
+      run: |
+        meson setup emulator --buildtype=release
+
+    - name: Build with Meson
+      run: |
+        meson compile -C emulator
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-artifacts
+        path: builddir/
