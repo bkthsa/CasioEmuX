@@ -7,10 +7,11 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:  # This allows manual triggering from the GitHub UI
 
 jobs:
   build:
-    runs-on: windows-latest  # This ensures that your build runs on a Windows environment.
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
