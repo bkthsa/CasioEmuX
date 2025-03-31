@@ -47,7 +47,7 @@ jobs:
         meson compile -C builddir
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: windows-emulator-${{ github.event.inputs.build-type }}
         path: ./emulator/builddir/emulator.exe
