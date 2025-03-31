@@ -1,6 +1,24 @@
 name: Windows Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      build-type:
+        description: 'Build type (debug/release)'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+        - debug
+        - release
+      architecture:
+        description: 'Target architecture'
+        required: true
+        default: 'x64'
+        type: choice
+        options:
+        - x86
+        - x64
   push:
     branches: [ "main" ]
   pull_request:
@@ -27,7 +45,10 @@ jobs:
     - name: Configure build
       working-directory: ./emulator
       run: |
-        meson setup builddir --backend vs2022
+        meson setup builddir ^
+          --backend vs2022 ^
+          --buildtype ${{ github.event.inputs.build-type }} ^
+          --native-file meson-windows-${{ github.event.inputs.architecture }}.txt
 
     - name: Compile
       working-directory: ./emulator
@@ -37,5 +58,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: windows-emulator
-        path: ./emulator/builddir/emulator.exe  # Update to match your output name
+        name: windows-emulator-${{ github.event.inputs.architecture }}-${{ github.event.inputs.build-type }}
+        path: ./emulator/builddir/emulator.exe
