@@ -1,46 +1,41 @@
-name: C++ Build with Meson on Windows
+name: Windows Build
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:  # Manual trigger from GitHub UI
+    branches: [ "main" ]
 
 jobs:
-  build:
-    runs-on: windows-latest  # This ensures the build runs on a Windows environment
+  build-windows:
+    runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.x'  # Install the latest version of Python
+        python-version: '3.x'
 
-    - name: Install Meson and Ninja using pip
+    - name: Install Meson and Ninja
       run: |
-        python -m pip install --upgrade pip  # Ensure pip is up-to-date
-        pip install meson ninja  # Install Meson and Ninja via pip
+        python -m pip install --upgrade pip
+        pip install meson ninja
 
-    - name: Verify Meson installation
+    - name: Configure build
+      working-directory: ./emulator
       run: |
-        meson --version  # Verify that Meson is installed
+        meson setup builddir --backend vs2022
 
-    - name: Configure Meson (Build Setup)
-      run: |
-        meson setup builddir --buildtype=release
-
-    - name: Build with Meson
+    - name: Compile
+      working-directory: ./emulator
       run: |
         meson compile -C builddir
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: build-artifacts
-        path: builddir/
+        name: windows-emulator
+        path: ./emulator/builddir/emulator.exe  # Update to match your output name
