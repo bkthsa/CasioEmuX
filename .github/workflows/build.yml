@@ -17,20 +17,30 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Meson and Ninja
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Install the latest version of Python
+
+    - name: Install Meson and Ninja using pip
       run: |
-        choco install meson ninja
+        python -m pip install --upgrade pip  # Ensure pip is up-to-date
+        pip install meson ninja  # Install Meson and Ninja via pip
+
+    - name: Verify Meson installation
+      run: |
+        meson --version  # Verify that Meson is installed
 
     - name: Configure Meson (Build Setup)
       run: |
-        meson setup emulator --buildtype=release
+        meson setup builddir --buildtype=release
 
     - name: Build with Meson
       run: |
-        meson compile -C emulator
+        meson compile -C builddir
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: build-artifacts
-        path: emulator/
+        path: builddir/
