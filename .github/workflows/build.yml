@@ -7,11 +7,11 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger from GitHub UI
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-latest  # This ensures the build runs on a Windows environment
 
     steps:
     - name: Checkout repository
@@ -20,11 +20,6 @@ jobs:
     - name: Set up Meson and Ninja
       run: |
         choco install meson ninja
-
-    - name: Install Visual Studio Build Tools
-      run: |
-        choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools"
-        choco install visualstudio2019-workload-vctools
 
     - name: Configure Meson (Build Setup)
       run: |
@@ -35,7 +30,7 @@ jobs:
         meson compile -C emulator
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4  # Changed version to v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
-        path: builddir/
+        path: emulator/
