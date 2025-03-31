@@ -11,14 +11,6 @@ on:
         options:
         - debug
         - release
-      architecture:
-        description: 'Target architecture'
-        required: true
-        default: 'x64'
-        type: choice
-        options:
-        - x86
-        - x64
   push:
     branches: [ "main" ]
   pull_request:
@@ -45,18 +37,17 @@ jobs:
     - name: Configure build
       working-directory: ./emulator
       run: |
-        meson setup builddir ^
-          --backend vs2022 ^
-          --buildtype ${{ github.event.inputs.build-type }} ^
-          --native-file meson-windows-${{ github.event.inputs.architecture }}.txt
-
+        meson setup builddir `
+          --backend vs2022 `
+          --buildtype ${{ github.event.inputs.build-type }}
+      
     - name: Compile
       working-directory: ./emulator
       run: |
         meson compile -C builddir
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: windows-emulator-${{ github.event.inputs.architecture }}-${{ github.event.inputs.build-type }}
+        name: windows-emulator-${{ github.event.inputs.build-type }}
         path: ./emulator/builddir/emulator.exe
